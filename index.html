@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AR Modell</title>
+  <title>RiPole AR</title>
 
   <!-- model-viewer laden -->
   <script type="module"
@@ -13,19 +13,55 @@
   <style>
     html, body {
       margin: 0;
+      padding: 0;
       height: 100%;
       overflow: hidden;
       background: #000;
+      color: #fff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    /* model-viewer unsichtbar halten: nur als AR-Launcher nutzen */
     model-viewer {
-      width: 100vw;
-      height: 100vh;
+      width: 0;
+      height: 0;
+      visibility: hidden;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    #fallback {
+      text-align: center;
+      padding: 16px;
+      max-width: 320px;
+      font-size: 0.95rem;
+      line-height: 1.4;
+      opacity: 0.9;
+    }
+
+    #fallback strong {
       display: block;
-      --poster-color: transparent;
+      margin-bottom: 6px;
+      font-size: 1.05rem;
     }
   </style>
 </head>
 <body>
+
+  <!-- Fallback-Anzeige für Geräte ohne/mit blockierter AR -->
+  <div id="fallback" hidden>
+    <strong>AR nicht automatisch gestartet.</strong>
+    Entweder unterstützt dieses Gerät keine AR-Funktion,
+    oder der Browser verlangt eine Interaktion.
+    <br><br>
+    Bitte tippe einmal irgendwo auf den Bildschirm, um die AR-Ansicht zu öffnen.
+  </div>
+
+  <!-- Versteckter model-viewer nur als AR-Launcher -->
   <model-viewer
     id="arModel"
     src="assets/RiPole_V1-4.glb"
@@ -35,7 +71,6 @@
     ar-modes="webxr scene-viewer quick-look"
     ar-scale="auto"
     ar-placement="floor"
-    camera-controls
     environment-image="neutral"
     exposure="1"
     scale="0.0005 0.0005 0.0005"
@@ -44,23 +79,34 @@
 
   <script>
     const mv = document.getElementById('arModel');
+    const fallback = document.getElementById('fallback');
 
-    // Versuch, automatisch AR zu starten, sobald das Modell geladen ist
-    mv.addEventListener('load', async () => {
+    // Direkt nach Laden des Modells versuchen, AR zu starten
+    mv.addEventListener('load', () => {
       try {
-        // Prüfen, ob AR überhaupt verfügbar ist
-        const supportsAR = await mv.canActivateAR;
-        if (supportsAR) {
-          // Viele Browser erfordern dennoch eine Nutzerinteraktion,
-          // aber dieser Versuch startet AR sofort, wenn erlaubt
+        if (mv.canActivateAR) {
           mv.activateAR();
         } else {
-          console.warn('AR not supported on this device.');
+          // AR technisch nicht verfügbar
+          fallback.hidden = false;
         }
       } catch (e) {
-        console.warn('Automatic AR start failed:', e);
+        // Autostart blockiert oder Fehler -> Fallback anzeigen
+        fallback.hidden = false;
       }
     });
+
+    // Für Browser, die eine User-Interaktion verlangen:
+    // erster Tap irgendwo auf der Seite startet AR.
+    document.body.addEventListener('click', () => {
+      try {
+        if (mv.canActivateAR) {
+          mv.activateAR();
+        }
+      } catch (e) {
+        // Wenn das auch fehlschlägt, bleibt der Fallback.
+      }
+    }, { once: true });
   </script>
 </body>
 </html>
