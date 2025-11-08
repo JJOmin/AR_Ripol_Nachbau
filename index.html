@@ -3,208 +3,64 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AR Modell Demo</title>
+  <title>AR Modell</title>
 
-  <!-- model-viewer laden (offizielle CDN-Version) -->
+  <!-- model-viewer laden -->
   <script type="module"
           src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
   </script>
 
   <style>
-    :root {
-      --bg-color: #0f1115;
-      --text-color: #f5f5f5;
-      --accent-color: #ffffff;
-      --accent-border: rgba(255, 255, 255, 0.35);
-    }
-
-    * {
-      box-sizing: border-box;
+    html, body {
       margin: 0;
-      padding: 0;
-      overflow: hidden;        /* disables scrolling */
-    }
-
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #171a20, #050509);
-      color: var(--text-color);
-      min-height: 100vh;
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    header {
-      text-align: center;
-    }
-
-    header h1 {
-      font-size: 1.4rem;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #9ea3b5;
-      margin-bottom: 4px;
-    }
-
-    header h2 {
-      font-size: 1.9rem;
-      font-weight: 600;
-      color: #ffffff;
-      margin-bottom: 6px;
-    }
-
-    header p {
-      font-size: 0.9rem;
-      color: #a8adbc;
-    }
-
-    .viewer-wrapper {
-      position: relative;
-      border-radius: 18px;
+      height: 100%;
       overflow: hidden;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
-      background: radial-gradient(circle at top, #191d25, #050509);
+      background: #000;
     }
-
     model-viewer {
-      width: 100%;
-      height: min(70vh, 560px);
+      width: 100vw;
+      height: 100vh;
+      display: block;
       --poster-color: transparent;
-    }
-
-    .ar-button {
-      position: absolute;
-      right: 16px;
-      bottom: 16px;
-      padding: 10px 18px;
-      border-radius: 999px;
-      border: 1px solid var(--accent-border);
-      background: rgba(5, 5, 9, 0.92);
-      backdrop-filter: blur(10px);
-      color: var(--accent-color);
-      font-size: 0.85rem;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: all 0.18s ease;
-    }
-
-    .ar-button span {
-      font-size: 1.1rem;
-      line-height: 1;
-    }
-
-    .ar-button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55);
-      border-color: rgba(255, 255, 255, 0.6);
-    }
-
-    .ar-button:active {
-      transform: translateY(1px);
-      box-shadow: none;
-    }
-
-    .ar-not-supported {
-      position: absolute;
-      left: 16px;
-      bottom: 16px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      color: #ffb4b4;
-      background: rgba(40, 16, 16, 0.96);
-      border: 1px solid rgba(255, 120, 120, 0.4);
-      display: none;
-    }
-
-    model-viewer[ar-status="not-presenting"] .ar-not-supported[hidden=false] {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    footer {
-      text-align: center;
-      font-size: 0.7rem;
-      color: #6c7282;
-      margin-top: 2px;
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <header>
-      <h2>3D-Modell des Subs</h2>
-    </header>
-
-    <div class="viewer-wrapper">
-      <model-viewer
-        src="assets/RiPole_V1-4.glb"
-        ios-src="assets/model.usdz"
-        alt="3D model"
-        ar
-        ar-modes="webxr scene-viewer quick-look"
-        ar-scale="auto"
-        ar-placement="floor"
-        camera-controls
-        touch-action="pan-y"
-        shadow-intensity="0.4"
-        environment-image="neutral"
-        exposure="1"
-        scale="0.0005 0.0005 0.0005"
-        xr-environment
-        autoplay
-        >
-        
-        <!-- Custom AR-Button -->
-        <button slot="ar-button" class="ar-button">
-          <span>⬓</span>
-          In AR ansehen
-        </button>
-
-        <!-- Hinweis, falls AR nicht unterstützt wird -->
-        <div class="ar-not-supported" id="arNotSupported" hidden>
-          <span>⚠</span> AR wird auf diesem Gerät nicht unterstützt.
-        </div>
-      </model-viewer>
-    </div>
-
-    <footer>
-      Hinweis: AR erfordert ein kompatibles Gerät (WebXR / ARCore / ARKit) und eine aktuelle Browser-Version.
-    </footer>
-  </div>
+  <model-viewer
+    id="arModel"
+    src="assets/RiPole_V1-4.glb"
+    ios-src="assets/model.usdz"
+    alt="RiPole Subwoofer"
+    ar
+    ar-modes="webxr scene-viewer quick-look"
+    ar-scale="auto"
+    ar-placement="floor"
+    camera-controls
+    environment-image="neutral"
+    exposure="1"
+    scale="0.0005 0.0005 0.0005"
+    autoplay>
+  </model-viewer>
 
   <script>
-    // Zeige Hinweis, falls AR nicht verfügbar ist
-    const mv = document.getElementById('ar-model');
-    const arWarning = document.getElementById('arNotSupported');
+    const mv = document.getElementById('arModel');
 
-    if (mv) {
-      if (!mv.canActivateAR) {
-        arWarning.hidden = false;
-      }
-      mv.addEventListener('ar-status', (event) => {
-        if (event.detail.status === 'failed') {
-          arWarning.hidden = false;
+    // Versuch, automatisch AR zu starten, sobald das Modell geladen ist
+    mv.addEventListener('load', async () => {
+      try {
+        // Prüfen, ob AR überhaupt verfügbar ist
+        const supportsAR = await mv.canActivateAR;
+        if (supportsAR) {
+          // Viele Browser erfordern dennoch eine Nutzerinteraktion,
+          // aber dieser Versuch startet AR sofort, wenn erlaubt
+          mv.activateAR();
+        } else {
+          console.warn('AR not supported on this device.');
         }
-      });
-    }
+      } catch (e) {
+        console.warn('Automatic AR start failed:', e);
+      }
+    });
   </script>
 </body>
 </html>
