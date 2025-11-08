@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AR Modell Demo</title>
+
+  <!-- model-viewer laden (offizielle CDN-Version) -->
+  <script type="module"
+          src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js">
+  </script>
+
+  <style>
+    :root {
+      --bg-color: #0f1115;
+      --text-color: #f5f5f5;
+      --accent-color: #ffffff;
+      --accent-border: rgba(255, 255, 255, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #171a20, #050509);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    header {
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #9ea3b5;
+      margin-bottom: 4px;
+    }
+
+    header h2 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      color: #a8adbc;
+    }
+
+    .viewer-wrapper {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+      background: radial-gradient(circle at top, #191d25, #050509);
+    }
+
+    model-viewer {
+      width: 100%;
+      height: min(70vh, 560px);
+      --poster-color: transparent;
+    }
+
+    .ar-button {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid var(--accent-border);
+      background: rgba(5, 5, 9, 0.92);
+      backdrop-filter: blur(10px);
+      color: var(--accent-color);
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .ar-button span {
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .ar-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55);
+      border-color: rgba(255, 255, 255, 0.6);
+    }
+
+    .ar-button:active {
+      transform: translateY(1px);
+      box-shadow: none;
+    }
+
+    .ar-not-supported {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      color: #ffb4b4;
+      background: rgba(40, 16, 16, 0.96);
+      border: 1px solid rgba(255, 120, 120, 0.4);
+      display: none;
+    }
+
+    model-viewer[ar-status="not-presenting"] .ar-not-supported[hidden=false] {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.7rem;
+      color: #6c7282;
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <h1>View in AR</h1>
+      <h2>Platziere das 3D-Modell direkt im Raum</h2>
+      <p>Scanne diesen Link oder QR-Code auf einem AR-fähigen Smartphone oder Tablet.</p>
+    </header>
+
+    <div class="viewer-wrapper">
+      <model-viewer
+        id="ar-model"
+        src="assets/RiPole_V1-4.glb"
+        ios-src="assets/model.usdz"
+        alt="3D-Modell in Originalgröße zur Betrachtung in Augmented Reality."
+        ar
+        ar-modes="webxr scene-viewer quick-look"
+        ar-scale="fixed"
+        ar-placement="floor"
+        camera-controls
+        touch-action="pan-y"
+        shadow-intensity="0.4"
+        environment-image="neutral"
+        exposure="1"
+        xr-environment
+        autoplay
+        >
+        <!-- Custom AR-Button -->
+        <button slot="ar-button" class="ar-button">
+          <span>⬓</span>
+          In AR ansehen
+        </button>
+
+        <!-- Hinweis, falls AR nicht unterstützt wird -->
+        <div class="ar-not-supported" id="arNotSupported" hidden>
+          <span>⚠</span> AR wird auf diesem Gerät nicht unterstützt.
+        </div>
+      </model-viewer>
+    </div>
+
+    <footer>
+      Hinweis: AR erfordert ein kompatibles Gerät (WebXR / ARCore / ARKit) und eine aktuelle Browser-Version.
+    </footer>
+  </div>
+
+  <script>
+    // Zeige Hinweis, falls AR nicht verfügbar ist
+    const mv = document.getElementById('ar-model');
+    const arWarning = document.getElementById('arNotSupported');
+
+    if (mv) {
+      if (!mv.canActivateAR) {
+        arWarning.hidden = false;
+      }
+      mv.addEventListener('ar-status', (event) => {
+        if (event.detail.status === 'failed') {
+          arWarning.hidden = false;
+        }
+      });
+    }
+  </script>
+</body>
+</html>
