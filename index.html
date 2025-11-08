@@ -164,7 +164,6 @@
     <div class="viewer-wrapper">
       <model-viewer
         src="assets/RiPole_V1-4.glb"
-        style="--model-color: hsl(38, 23%, 66%);"
         ios-src="assets/model.usdz"
         alt="3D model"
         ar
@@ -199,21 +198,29 @@
     </footer>
   </div>
 
-  <script>
-    // Zeige Hinweis, falls AR nicht verfügbar ist
-    const mv = document.getElementById('ar-model');
-    const arWarning = document.getElementById('arNotSupported');
+  <script type="module">
+  const mv = document.querySelector('model-viewer');
+  const arWarning = document.getElementById('arNotSupported');
 
-    if (mv) {
-      if (!mv.canActivateAR) {
-        arWarning.hidden = false;
-      }
-      mv.addEventListener('ar-status', (event) => {
-        if (event.detail.status === 'failed') {
-          arWarning.hidden = false;
-        }
-      });
+  mv.addEventListener('load', () => {
+    // recolor the first material
+    const materials = mv.model.materials;
+    if (materials.length > 0 && materials[0].pbrMetallicRoughness) {
+      // hsl(38,23%,66%) → rgb(202, 181, 141)
+      materials[0].pbrMetallicRoughness.setBaseColorFactor([202/255, 181/255, 141/255, 1.0]);
     }
-  </script>
+  });
+
+  // optional: show AR warning
+  if (!mv.canActivateAR) {
+    arWarning.hidden = false;
+  }
+  mv.addEventListener('ar-status', (event) => {
+    if (event.detail.status === 'failed') {
+      arWarning.hidden = false;
+    }
+  });
+</script>
+
 </body>
 </html>
