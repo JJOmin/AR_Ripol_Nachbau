@@ -208,7 +208,8 @@
     mv.addEventListener('load', () => {
       const materials = mv.model.materials;
       if (materials.length > 0 && materials[0].pbrMetallicRoughness) {
-        materials[0].pbrMetallicRoughness.setBaseColorFactor([202/255, 181/255, 141/255, 1.0]);
+        //materials[0].pbrMetallicRoughness.setBaseColorFactor([202/255, 181/255, 141/255, 1.0]);
+        materials[0].pbrMetallicRoughness.setBaseColorFactor([0.86, 0.86, 0.86, 1.0]);
       }
     });
 
